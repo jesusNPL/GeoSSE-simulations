@@ -2,7 +2,6 @@ setwd("")
 
 rm(list = ls())
 
-
 library(diversitree)
 
 ## Read the phylogenetic trees
@@ -100,12 +99,10 @@ sim.fit.full <- list()
 
 sim.fit.null <- list()
 
-
 full.lik <- list()
 null.lik <- list()
 full.fit <- list()
 null.fit <- list()
-
 
 for(i in 1:100){
   
@@ -124,7 +121,6 @@ sim.null.lik <- lapply(sim.full.lik, constrain,
 null.lik[[i]] <- sim.null.lik
 }
 
-
 sim.fit.full <- lapply(unlist(full.lik), find.mle, p, method = 'subplex')
 sim.fit.full
 sim.fit.null <- lapply(unlist(null.lik), find.mle, p[-c(2, 3, 5, 7)])
@@ -142,26 +138,7 @@ mean(lr.emp <= null.dist) # Simulation-based P-value
 
 save.image("SimulationFinal.RData")
 
-
-##### Final plot of the simulation-based p-value
-tiff(filename = "p_value.tif", width = 15, height = 20, units = "cm", 
-     pointsize = 12, compression = "lzw", bg = "white", res = 600)
-
-par(oma = c(2, 2.5, 1, 1))
-par(mar = c(3, 4, 1, 1))
-par(lwd = 1.5)
-par(cex.axis = 1.3)
-
-hist(null.dist, col = "black", main = NULL, xlim = c(0, 300),
-     xlab = NULL, ylab = NULL, lty = 0, yaxt = "n", xaxt = "n"); axis(2, labels = F)
-axis(1, labels = T)
-abline(v = lr.emp, col = "darkgray", lwd = 3, lty = 2)
-title(xlab = "??LL", outer = T, line = 0, cex = 3, font = 2, cex.lab = 1.5)
-title(ylab = "Frecuency", outer = T, line = -2, cex = 3, font = 2, cex.lab = 1.5)
-
-dev.off()
-
-#####Observed models
+##### Observed and simulated  models #####
 
 full <- read.csv("Observed_best.csv")
 null <- read.csv("Observed_null.csv")
@@ -174,7 +151,6 @@ hist(dLL)
 abline(v = meandLL, col = "red")
 
 hist(dLL, col = "gray", add = T, lty = 0)
-
 
 ##### Final plot of the simulation-based p-value with an inset of the observed dLL
 library(Hmisc)

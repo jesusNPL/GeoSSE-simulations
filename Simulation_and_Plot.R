@@ -64,7 +64,7 @@ for(i in 1:100){
 
 simutrait[[1]]
 
-# Using lapply, this return the list object of simulated character states
+# Using lapply, this return a list object of simulated character states (same as in lines 56 to 65)
 
 z <- as.numeric(traitsim[[1]])
 names(z) <- tr$tip.label

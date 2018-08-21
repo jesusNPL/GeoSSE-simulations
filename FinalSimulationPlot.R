@@ -1,39 +1,23 @@
-setwd("E:/DOUTORADO/Chapters/Furnarii_JBI/Revision/NewAnalysis/Simulation")
+setwd("")
 
 rm(list = ls())
 
 
 library(diversitree)
 
-##Read the phylogenetic trees
+## Read the phylogenetic trees
 
-tr <- read.nexus("E:/DOUTORADO/Chapters/Furnarii_JBI/Revision/NewAnalysis/furnariiMCC.nex")
+tr <- read.nexus("tree.nex")
 
-trs <- read.tree("E:/DOUTORADO/Chapters/Furnarii_JBI/Revision/NewAnalysis/furnarii-trees.tre")
+trs <- read.tree("trees.nex")
 
 tr100 <- sample(trs, 100)
 
-##Read the character states and match with the species on the trees
-
-ch <- as.matrix(read.csv("bird-states.csv", row.names = 1))
-head(ch)
-
-states <- as.numeric(ch[,1])
-names(states) <- row.names(ch)
-head(states)
-
-##Join the trees with the states in a single tree
-#MCC tree
-trmcc <- tr
-trmcc$chr <- states
-
-#Multiphylo
-
-#function to fix subplex error
+# function to fix subplex error
 fixerror <- function(lik2, p) {
-  res <- try(find.mle(lik2, p[argnames(lik2)], method="subplex"))
+  res <- try(find.mle(lik2, p[argnames(lik2)], method = "subplex"))
   if ( inherits(res, "try-error") ) 
-    res <- list(lnLik=-Inf)
+    res <- list(lnLik = -Inf)
   res
 }
 
@@ -41,11 +25,11 @@ fixerror <- function(lik2, p) {
 
 library(phytools)
 
-##Simulate a Character Distribution on a Tree
+## Simulate a Character Distribution on a Tree
 
-#Fit a trait-independent model to the data (e.g., the mkn model, in this case)
+# Fit a trait-independent model to the data (e.g., the mkn model, in this case)
 # Read character states data, is the same matrix of the GeoSSE analysis
-char <- read.csv("E:/DOUTORADO/Chapters/Furnarii_JBI/Revision/NewAnalysis/Ancestral/bird_states.csv", row.names = 1)
+char <- read.csv("states.csv", row.names = 1)
 
 # Character data for analysis
 sp <- char[trs[[1]]$tip.label, ]
@@ -67,7 +51,7 @@ colnames(Q) <- c(1, 0, 2)
 rownames(Q) <- c(1, 0, 2)
 Q
 
-#Simulate the traits using the matrix of transitions of SIMMAP
+# Simulate the traits using the matrix of transitions of SIMMAP
 sim <- phytools::sim.history(tr, Q, anc = NULL, nsim = 1)$states #trait simulation
 
 simutrait <- list()
@@ -81,7 +65,7 @@ for(i in 1:100){
 
 simutrait[[1]]
 
-# Using lapply
+# Using lapply, this return the list object of simulated character states
 
 z <- as.numeric(traitsim[[1]])
 names(z) <- tr$tip.label
@@ -107,7 +91,7 @@ simsl[[2]]
 
 library(diversitree)
 
-#Simulation based GeoSSE
+# Simulation based GeoSSE
 sim.full.lik <- list()
 
 sim.null.lik <- list()
@@ -123,7 +107,7 @@ full.fit <- list()
 null.fit <- list()
 
 
-for(i in 1:10){
+for(i in 1:100){
   
   print(i)
   
@@ -146,9 +130,9 @@ sim.fit.full
 sim.fit.null <- lapply(unlist(null.lik), find.mle, p[-c(2, 3, 5, 7)])
 sim.fit.null
 
-null.dist <- numeric(length = 5000)
+null.dist <- numeric(length = 10000)
 
-for (i in 1:5000) null.dist[i] <- 2 * (sim.fit.full[[i]]$lnLik -
+for (i in 1:10000) null.dist[i] <- 2 * (sim.fit.full[[i]]$lnLik -
                                           sim.fit.null[[i]]$lnLik)
 hist(null.dist)# See what the null distribution looks like
 lr.emp <- 2 * (fit.full$lnLik - fit.null$lnLik)
@@ -195,7 +179,7 @@ hist(dLL, col = "gray", add = T, lty = 0)
 ##### Final plot of the simulation-based p-value with an inset of the observed dLL
 library(Hmisc)
 
-tiff(filename = "p_value50_inset_final3.tif", width = 15, height = 20, units = "cm", 
+tiff(filename = "p_value_inset_final.tif", width = 15, height = 20, units = "cm", 
      pointsize = 12, compression = "lzw", bg = "white", res = 600)
 
 par(oma = c(2, 2.5, 1, 1))
